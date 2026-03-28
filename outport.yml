@@ -1,0 +1,79 @@
+name: example
+
+services:
+  api:
+    env_var: API_PORT
+    hostname: api.example.test
+    env_file:
+      - api/.env
+  app:
+    env_var: APP_PORT
+    hostname: example.test
+    env_file:
+      - app/.env
+  admin:
+    env_var: ADMIN_PORT
+    hostname: admin.example.test
+    env_file:
+      - admin/.env
+  docs:
+    env_var: DOCS_PORT
+    hostname: docs.example.test
+    env_file:
+      - docs/.env
+
+computed:
+  # Each service's own browser-facing URL (dynamic per instance)
+  APP_URL:
+    value: "${app.url}"
+    env_file: app/.env
+
+  ADMIN_URL:
+    value: "${admin.url}"
+    env_file: admin/.env
+
+  API_SELF_URL:
+    value: "${api.url}"
+    env_file: api/.env
+
+  DOCS_URL:
+    value: "${docs.url}"
+    env_file: docs/.env
+
+  # Frontend → API wiring (server-to-server, use :direct)
+  API_URL:
+    value: "${api.url:direct}"
+    env_file:
+      - app/.env
+      - admin/.env
+
+  # Frontend → API wiring (browser-facing, for display)
+  API_HOSTNAME:
+    value: "${api.url}"
+    env_file:
+      - app/.env
+      - admin/.env
+
+  # API → Frontend wiring (browser-facing, for CORS)
+  CORS_ORIGINS:
+    value: "${app.url},${admin.url}"
+    env_file: api/.env
+
+  # Docker Compose isolation per worktree
+  COMPOSE_PROJECT_NAME:
+    value: "${project_name}${instance:+-${instance}}"
+    env_file: docker/.env
+
+  # Process-compose integration
+  HEALTH_CHECK_URL:
+    value: "${api.url:direct}/health"
+    env_file: .pc_env
+
+  PC_SOCKET_PATH:
+    value: "/tmp/process-compose-${project_name}${instance:+-${instance}}.sock"
+    env_file: .pc_env
+
+  # Bruno API testing (server-to-server)
+  BRUNO_API_URL:
+    value: "${api.url:direct}"
+    env_file: bruno/.env

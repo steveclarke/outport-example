@@ -1,0 +1,28 @@
+shell:
+  shell_command: "bash"
+  shell_argument: "-lc"
+
+processes:
+  api:
+    command: bin/start-api
+    readiness_probe:
+      exec:
+        command: "curl -sf ${HEALTH_CHECK_URL}"
+      initial_delay_seconds: 1
+      period_seconds: 3
+      failure_threshold: 5
+
+  app:
+    command: bin/start-app
+    depends_on:
+      api:
+        condition: process_healthy
+
+  admin:
+    command: bin/start-admin
+    depends_on:
+      api:
+        condition: process_healthy
+
+  docs:
+    command: bin/start-docs

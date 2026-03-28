@@ -1,0 +1,8 @@
+{
+  "name": "outport-example",
+  "private": true,
+  "workspaces": ["api", "app", "admin", "docs"],
+  "scripts": {
+    "setup": "npm install"
+  }
+}

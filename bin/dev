@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# process-compose reads .pc_env at startup and picks up PC_SOCKET_PATH,
+# which outport writes with a per-instance value. This auto-enables UDS
+# mode with a unique socket per worktree — no manual flags needed.
+
+cd "$(dirname "$0")/.."
+
+# Auto-setup on first run
+if [ ! -f api/.env ]; then
+  bin/setup
+fi
+
+case "${1:-}" in
+  -D)        shift; process-compose up -D "$@" ;;
+  stop)      process-compose down ;;
+  status)
+    fmt="--output wide"; [[ "${2:-}" == "--json" ]] && fmt="--output json"
+    process-compose process list $fmt 2>/dev/null \
+      || { echo "Dev environment is not running. Start it with: bin/dev"; exit 1; }
+    ;;
+  logs)      process-compose process logs "${2:?specify a service}" ;;
+  restart)
+    if [ -n "${2:-}" ]; then
+      process-compose process restart "$2"
+    else
+      for svc in api app admin docs; do
+        process-compose process restart "$svc"
+      done
+    fi
+    ;;
+  *)         process-compose up "$@" ;;
+esac

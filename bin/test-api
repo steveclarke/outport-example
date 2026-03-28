@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+echo "=== API (api.example.test) ==="
+source api/.env
+curl -s "http://localhost:${API_PORT}/"
+echo -e "\n"
+
+echo "=== App (example.test) ==="
+source app/.env
+curl -s "http://localhost:${APP_PORT}/" | head -5
+echo -e "\n"
+
+echo "=== Admin (admin.example.test) ==="
+source admin/.env
+curl -s "http://localhost:${ADMIN_PORT}/" | head -5
+echo -e "\n"
+
+echo "=== Docs (docs.example.test) ==="
+source docs/.env
+curl -s "http://localhost:${DOCS_PORT}/" | head -5
+echo

@@ -1,0 +1,7 @@
+# Local overrides — uncomment to customize for your environment.
+# This file is for your machine only (gitignored in real projects).
+#
+# Only open the app and API when running `outport open`:
+# open:
+#   - app
+#   - api
